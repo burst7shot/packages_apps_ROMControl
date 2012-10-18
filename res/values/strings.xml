@@ -71,6 +71,7 @@
     <string name="title_show_screenshot">Show screenshot</string>
     <string name="title_show_torch_toggle">Show torch toggle</string>
     <string name="title_show_airplane_toggle">Show airplane toggle</string>
+    <string name="power_menu_expanded_desktop">Show Expanded desktop toggle</string>
     <string name="title_show_navbar_hide">Show navigation bar toggle</string>
 
     <!-- Power Saving -->
