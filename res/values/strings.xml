@@ -864,6 +864,7 @@
     <string name="show_with_dbm">Show with dBm</string>
 
     <!-- statusbar color -->
+    <string name="title_statusbar">Statusbar</string>
     <string name="status_bar_color_title">Statusbar Color</string>
 
 </resources>

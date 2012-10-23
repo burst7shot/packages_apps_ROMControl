@@ -29,7 +29,7 @@ public class StatusBar extends AOKPPreferenceFragment implements
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.prefs_statusbar);
 
-        mStatusBarColor = (ColorPickerPreference) prefSet.findPreference(STATUS_BAR_COLOR);
+        mStatusBarColor = (ColorPickerPreference) findPreference(STATUS_BAR_COLOR);
         mStatusBarColor.setOnPreferenceChangeListener(this);
 
     }
@@ -45,7 +45,7 @@ public class StatusBar extends AOKPPreferenceFragment implements
 
             int intHex = ColorPickerPreference.convertToColorInt(hex);
             Settings.System.putInt(getActivity().getContentResolver(),
-                    Settings.System.STATUSBAR_COLOR, intHex);
+                    Settings.System.STATUS_BAR_COLOR, intHex);
             Log.e("ROMAN", intHex + "");
         }
         return result;
