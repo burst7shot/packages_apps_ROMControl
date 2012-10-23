@@ -39,7 +39,8 @@
 
     <header
         android:id="@+id/statusbar"
-        android:title="@string/header_statusbar" />
+        android:title="@string/header_statusbar"
+        android:fragment="com.aokp.romcontrol.fragments.StatusBar" />
 
     <header
         android:id="@+id/statusbar_battery"
