@@ -59,7 +59,7 @@ public class StatusBarClock extends AOKPPreferenceFragment implements
         mClockStyle.setOnPreferenceChangeListener(this);
         mClockStyle.setValue(Integer.toString(Settings.System.getInt(getActivity()
                 .getContentResolver(), Settings.System.STATUSBAR_CLOCK_STYLE,
-                1)));
+                0)));
 
         mClockAmPmstyle = (ListPreference) findPreference(PREF_AM_PM_STYLE);
         mClockAmPmstyle.setOnPreferenceChangeListener(this);
