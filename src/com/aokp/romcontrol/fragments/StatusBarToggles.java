@@ -42,10 +42,12 @@ public class StatusBarToggles extends AOKPPreferenceFragment implements
 
     private static final String PREF_ENABLE_TOGGLES = "enabled_toggles";
     private static final String PREF_TOGGLES_PER_ROW = "toggles_per_row";
+    private static final String PREF_STATUSBAR_BACKGROUND_COLOR = "statusbar_background_color";
 
     Preference mEnabledToggles;
     Preference mLayout;
     ListPreference mTogglesPerRow;
+    ColorPickerPreference mStatusbarBgColor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,6 +62,10 @@ public class StatusBarToggles extends AOKPPreferenceFragment implements
         mTogglesPerRow.setOnPreferenceChangeListener(this);
         mTogglesPerRow.setValue(Settings.System.getInt(getActivity().getContentResolver(),
                 Settings.System.QUICK_TOGGLES_PER_ROW, 3) + "");
+
+        mStatusbarBgColor = (ColorPickerPreference) findPreference(PREF_STATUSBAR_BACKGROUND_COLOR);
+        mStatusbarBgColor.setOnPreferenceChangeListener(this);
+
         mLayout = findPreference("toggles");
 
     }
@@ -70,6 +76,15 @@ public class StatusBarToggles extends AOKPPreferenceFragment implements
             int val = Integer.parseInt((String) newValue);
             Settings.System.putInt(getActivity().getContentResolver(),
                     Settings.System.QUICK_TOGGLES_PER_ROW, val);
+        } else if (preference == mStatusbarBgColor) {
+            String hex = ColorPickerPreference.convertToARGB(Integer.valueOf(String
+                    .valueOf(newValue)));
+            preference.setSummary(hex);
+
+            int intHex = ColorPickerPreference.convertToColorInt(hex);
+            Settings.System.putInt(getActivity().getContentResolver(),
+                    Settings.System.STATUSBAR_BACKGROUND_COLOR, intHex);
+            Log.e("BAKED", intHex + "");
         }
         return false;
     }
