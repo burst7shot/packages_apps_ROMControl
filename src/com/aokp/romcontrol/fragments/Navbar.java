@@ -79,6 +79,8 @@ public class Navbar extends AOKPPreferenceFragment implements
     private static final String PREF_NAVRING_AMOUNT = "pref_navring_amount";
     private static final String ENABLE_NAVRING_LONG = "enable_navring_long";
     private static final String NAVIGATION_BAR_WIDGETS = "navigation_bar_widgets";
+    private static final String NAVIGATION_BAR_BACKGROUND_COLOR = "navigation_bar_background_color";
+    private static final String PREF_NAVBAR_BG_STYLE = "navbar_bg_style";
 
     public static final int REQUEST_PICK_CUSTOM_ICON = 200;
     public static final int REQUEST_PICK_LANDSCAPE_ICON = 201;
@@ -92,6 +94,7 @@ public class Navbar extends AOKPPreferenceFragment implements
     // move these later
     ColorPickerPreference mNavigationBarColor;
     ColorPickerPreference mNavigationBarGlowColor;
+    ColorPickerPreference mNavigationBarBgColor;
     ListPreference mGlowTimes;
     ListPreference menuDisplayLocation;
     ListPreference mNavBarMenuDisplay;
@@ -104,9 +107,11 @@ public class Navbar extends AOKPPreferenceFragment implements
     SeekBarPreference mButtonAlpha;
     CheckBoxPreference mEnableNavringLong;
     Preference mConfigureWidgets;
+    ListPreference mNavigationBarBgStyle;
 
     private int mPendingIconIndex = -1;
     private NavBarCustomAction mPendingNavBarCustomAction = null;
+    private int defaultBgColor = 0xFF000000;
 
     private static class NavBarCustomAction {
         String activitySettingName;
@@ -166,6 +171,12 @@ public class Navbar extends AOKPPreferenceFragment implements
         mEnableNavigationBar.setChecked(Settings.System.getInt(getContentResolver(),
                 Settings.System.NAVIGATION_BAR_SHOW, hasNavBarByDefault ? 1 : 0) == 1);
 
+        mNavigationBarBgStyle = (ListPreference) findPreference(PREF_NAVBAR_BG_STYLE);
+        mNavigationBarBgStyle.setOnPreferenceChangeListener(this);
+
+        mNavigationBarBgColor = (ColorPickerPreference) findPreference(NAVIGATION_BAR_BACKGROUND_COLOR);
+        mNavigationBarBgColor.setOnPreferenceChangeListener(this);
+
         mNavigationBarColor = (ColorPickerPreference) findPreference(PREF_NAV_COLOR);
         mNavigationBarColor.setOnPreferenceChangeListener(this);
 
@@ -200,6 +211,7 @@ public class Navbar extends AOKPPreferenceFragment implements
         refreshSettings();
         setHasOptionsMenu(true);
         updateGlowTimesSummary();
+        updateVisibility();
     }
 
     @Override
@@ -239,6 +251,11 @@ public class Navbar extends AOKPPreferenceFragment implements
                         Settings.System.NAVIGATION_CUSTOM_APP_ICONS[1], "");
                 Settings.System.putString(getActivity().getContentResolver(),
                         Settings.System.NAVIGATION_CUSTOM_APP_ICONS[2], "");
+
+                Settings.System.putInt(getActivity().getContentResolver(),
+                        Settings.System.NAVIGATION_BAR_BACKGROUND_STYLE, 2);
+                Settings.System.putInt(getActivity().getContentResolver(),
+                        Settings.System.NAVIGATION_BAR_BACKGROUND_COLOR, defaultBgColor);
                 refreshSettings();
                 return true;
             default:
@@ -372,6 +389,27 @@ public class Navbar extends AOKPPreferenceFragment implements
             Settings.System.putInt(getActivity().getContentResolver(),
                     Settings.System.NAVIGATION_BAR_TINT, intHex);
             return true;
+
+        } else if (preference == mNavigationBarBgStyle) {
+            int value = Integer.valueOf((String) newValue);
+            int index = mNavigationBarBgStyle.findIndexOfValue((String) newValue);
+            Settings.System.putInt(getActivity().getApplicationContext().getContentResolver(),
+                    Settings.System.NAVIGATION_BAR_BACKGROUND_STYLE, value);
+            preference.setSummary(mNavigationBarBgStyle.getEntries()[index]);
+            updateVisibility();
+            if (value == 2)
+                Helpers.restartSystemUI();
+            return true;
+
+        } else if (preference == mNavigationBarBgColor) {
+            String hex = ColorPickerPreference.convertToARGB(Integer.valueOf(String
+                    .valueOf(newValue)));
+            preference.setSummary(hex);
+            int intHex = ColorPickerPreference.convertToColorInt(hex);
+            Settings.System.putInt(getActivity().getContentResolver(),
+                    Settings.System.NAVIGATION_BAR_BACKGROUND_COLOR, intHex);
+            return true;
+
         } else if (preference == mNavigationBarGlowColor) {
             String hex = ColorPickerPreference.convertToARGB(
                     Integer.valueOf(String.valueOf(newValue)));
@@ -446,6 +484,16 @@ public class Navbar extends AOKPPreferenceFragment implements
                         .create();
         }
         return null;
+    }
+
+    private void updateVisibility() {
+        int visible = Settings.System.getInt(getActivity().getContentResolver(),
+                    Settings.System.NAVIGATION_BAR_BACKGROUND_STYLE, 2);
+        if (visible == 2) {
+            mNavigationBarBgColor.setEnabled(false);
+        } else {
+            mNavigationBarBgColor.setEnabled(true);
+        }
     }
 
     private void updateGlowTimesSummary() {

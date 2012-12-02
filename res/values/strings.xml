@@ -308,6 +308,9 @@
 
     <!-- Navigation Bar -->
     <string name="navigation_bar">Navigation bar</string>
+    <string name="statusbar_bg">Statusbar background</string>
+    <string name="statusbar_background_style">Statusbar background style</string>
+    <string name="navbar_bg_color">Navbar background color</string>
     <string name="navbar_button_cat">Navigation bar buttons</string>
     <string name="title_pref_menu_display">Menu location</string>
     <string name="summary_pref_menu_display">Remember to remove your menu buttons if you\'re using the big menu button!</string>
@@ -365,6 +368,12 @@
     <string name="navbar_widgets_shiftLeft">Shift left</string>
     <string name="navbar_widgets_shiftRight">Shift right</string>
     <string name="navbar_widgets_delete">Delete widget</string>
+    <string name="navbar_bg">Navbar background</string>
+    <string name="navbar_button_colors">Navbar button color</string>
+    <string name="navbar_background_style">Navbar background style</string>
+    <string name="navbar_color">Color/alpha only</string>
+    <string name="navbar_defaultbg_plus_color">Default Bg plus color/alpha</string>
+    <string name="navbar_defaultbg">Default Bg only</string>
 
     <!-- Nav Ring Targets -->
     <string name="navbar_ring_cat">Navigation Bar Ring Targets</string>
