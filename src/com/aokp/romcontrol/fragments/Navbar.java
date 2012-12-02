@@ -66,6 +66,7 @@ public class Navbar extends AOKPPreferenceFragment implements
         OnPreferenceChangeListener, ShortcutPickerHelper.OnPickListener {
 
     // move these later
+    private static final String NAV_BAR_TRANSPARENCY = "nav_bar_transparency";
     private static final String PREF_MENU_UNLOCK = "pref_menu_display";
     private static final String PREF_NAVBAR_MENU_DISPLAY = "navbar_menu_display";
     private static final String PREF_NAV_COLOR = "nav_button_color";
@@ -89,6 +90,7 @@ public class Navbar extends AOKPPreferenceFragment implements
     Preference mNavRingTargets;
 
     // move these later
+    ListPreference mNavigationBarTransparency;
     ColorPickerPreference mNavigationBarColor;
     ColorPickerPreference mNavigationBarGlowColor;
     ListPreference mGlowTimes;
@@ -129,6 +131,12 @@ public class Navbar extends AOKPPreferenceFragment implements
         mPicker = new ShortcutPickerHelper(this, this);
 
         mNavRingTargets = findPreference("navring_settings");
+
+        mNavigationBarTransparency = (ListPreference) findPreference(NAV_BAR_TRANSPARENCY);
+        int navBarTransparency = Settings.System.getInt(getActivity().getApplicationContext().getContentResolver(),
+                Settings.System.NAV_BAR_TRANSPARENCY, 100);
+        mNavigationBarTransparency.setValue(String.valueOf(navBarTransparency));
+        mNavigationBarTransparency.setOnPreferenceChangeListener(this);
 
         menuDisplayLocation = (ListPreference) findPreference(PREF_MENU_UNLOCK);
         menuDisplayLocation.setOnPreferenceChangeListener(this);
@@ -320,6 +328,12 @@ public class Navbar extends AOKPPreferenceFragment implements
                     Settings.System.NAVIGATION_BAR_HEIGHT_LANDSCAPE,
                     height);
             //showDialog(DIALOG_NAVBAR_HEIGHT_REBOOT);
+            return true;
+
+        } else if (preference == mNavigationBarTransparency) {
+            int navBarTransparency = Integer.valueOf((String) newValue);
+            Settings.System.putInt(getActivity().getContentResolver(),
+                    Settings.System.NAV_BAR_TRANSPARENCY, navBarTransparency);
             return true;
 
         } else if ((preference.getKey().startsWith("navbar_action"))

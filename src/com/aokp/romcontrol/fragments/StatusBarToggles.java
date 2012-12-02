@@ -17,6 +17,7 @@ import android.preference.PreferenceGroup;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceScreen;
 import android.provider.Settings;
+import android.provider.Settings.SettingNotFoundException;
 import android.content.res.Configuration;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,6 +44,9 @@ public class StatusBarToggles extends AOKPPreferenceFragment implements
     private static final String PREF_ENABLE_TOGGLES = "enabled_toggles";
     private static final String PREF_TOGGLES_PER_ROW = "toggles_per_row";
 
+    private static final String STATUS_BAR_TRANSPARENCY = "status_bar_transparency";
+
+    ListPreference mStatusbarTransparency;
     Preference mEnabledToggles;
     Preference mLayout;
     ListPreference mTogglesPerRow;
@@ -53,6 +57,12 @@ public class StatusBarToggles extends AOKPPreferenceFragment implements
         setTitle(R.string.title_statusbar_toggles);
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.prefs_statusbar_toggles);
+
+        mStatusbarTransparency = (ListPreference) findPreference(STATUS_BAR_TRANSPARENCY);
+        int statusBarTransparency = Settings.System.getInt(getActivity().getApplicationContext().getContentResolver(),
+                Settings.System.STATUS_BAR_TRANSPARENCY, 100);
+        mStatusbarTransparency.setValue(String.valueOf(statusBarTransparency));
+        mStatusbarTransparency.setOnPreferenceChangeListener(this);
 
         mEnabledToggles = findPreference(PREF_ENABLE_TOGGLES);
 
@@ -74,6 +84,11 @@ public class StatusBarToggles extends AOKPPreferenceFragment implements
             int val = Integer.parseInt((String) newValue);
             Settings.System.putInt(getActivity().getContentResolver(),
                     Settings.System.QUICK_TOGGLES_PER_ROW, val);
+
+        } else if (preference == mStatusbarTransparency) {
+            int statusBarTransparency = Integer.valueOf((String) newValue);
+            Settings.System.putInt(getActivity().getContentResolver(),
+                    Settings.System.STATUS_BAR_TRANSPARENCY, statusBarTransparency);
         }
         return false;
     }
