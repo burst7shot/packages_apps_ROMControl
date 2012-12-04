@@ -1,14 +1,19 @@
 
 package com.aokp.romcontrol.fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.app.ListFragment;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
@@ -16,6 +21,7 @@ import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceScreen;
+import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.content.res.Configuration;
 import android.util.Log;
@@ -44,12 +50,16 @@ public class StatusBarToggles extends AOKPPreferenceFragment implements
     private static final String PREF_TOGGLES_PER_ROW = "toggles_per_row";
     private static final String PREF_STATUSBAR_BACKGROUND_COLOR = "statusbar_background_color";
     private static final String PREF_STATUSBAR_BACKGROUND_STYLE = "statusbar_background_style";
+    private static final String PREF_TOGGLE_FAV_CONTACT = "toggle_fav_contact";
+
+    private final int PICK_CONTACT = 1;
 
     Preference mEnabledToggles;
     Preference mLayout;
     ListPreference mTogglesPerRow;
     ColorPickerPreference mStatusbarBgColor;
     ListPreference mStatusbarBgStyle;
+    Preference mFavContact;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,6 +82,8 @@ public class StatusBarToggles extends AOKPPreferenceFragment implements
         mStatusbarBgStyle.setOnPreferenceChangeListener(this);
 
         mLayout = findPreference("toggles");
+
+        mFavContact = findPreference(PREF_TOGGLE_FAV_CONTACT);
 
         updateVisibility();
     }
@@ -169,8 +181,38 @@ public class StatusBarToggles extends AOKPPreferenceFragment implements
             ft.replace(this.getId(), fragment);
             ft.commit();
         }
+        else if (preference == mFavContact) {
+            Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+            startActivityForResult(intent, PICK_CONTACT);
+            Log.e(TAG, "PICK_CONTACT");
+        }
         return super.onPreferenceTreeClick(preferenceScreen, preference);
 
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == PICK_CONTACT) {
+                Uri contactData = data.getData();
+                String[] projection = new String[] {ContactsContract.Contacts.LOOKUP_KEY};
+                String selection = ContactsContract.Contacts.DISPLAY_NAME + " IS NOT NULL";
+                CursorLoader cursorLoader =  new CursorLoader(getActivity().getBaseContext(), contactData, projection, selection, null, null);
+                Cursor cursor = cursorLoader.loadInBackground();
+                if (cursor != null) {
+                    try {
+                        if (cursor.moveToFirst()) {
+                            String lookup_key = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY));
+                            Settings.System.putString(getActivity().getContentResolver(),
+                            Settings.System.QUICK_TOGGLE_FAV_CONTACT, lookup_key);
+                        }
+                    } finally {
+                        cursor.close();
+                    }
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     public void addToggle(Context context, String key) {
