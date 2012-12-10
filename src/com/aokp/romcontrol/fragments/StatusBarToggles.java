@@ -37,7 +37,6 @@ import com.aokp.romcontrol.R;
 import com.aokp.romcontrol.widgets.TouchInterceptor;
 import com.aokp.romcontrol.widgets.SeekBarPreference;
 import com.scheffsblend.smw.Preferences.ImageListPreference;
-import net.margaritov.preference.colorpicker.ColorPickerPreference;
 
 import java.util.ArrayList;
 
@@ -48,8 +47,6 @@ public class StatusBarToggles extends AOKPPreferenceFragment implements
 
     private static final String PREF_ENABLE_TOGGLES = "enabled_toggles";
     private static final String PREF_TOGGLES_PER_ROW = "toggles_per_row";
-    private static final String PREF_STATUSBAR_BACKGROUND_COLOR = "statusbar_background_color";
-    private static final String PREF_STATUSBAR_BACKGROUND_STYLE = "statusbar_background_style";
     private static final String PREF_TOGGLE_FAV_CONTACT = "toggle_fav_contact";
 
     private final int PICK_CONTACT = 1;
@@ -57,8 +54,6 @@ public class StatusBarToggles extends AOKPPreferenceFragment implements
     Preference mEnabledToggles;
     Preference mLayout;
     ListPreference mTogglesPerRow;
-    ColorPickerPreference mStatusbarBgColor;
-    ListPreference mStatusbarBgStyle;
     Preference mFavContact;
 
     @Override
@@ -75,27 +70,10 @@ public class StatusBarToggles extends AOKPPreferenceFragment implements
         mTogglesPerRow.setValue(Settings.System.getInt(getActivity().getContentResolver(),
                 Settings.System.QUICK_TOGGLES_PER_ROW, 3) + "");
 
-        mStatusbarBgColor = (ColorPickerPreference) findPreference(PREF_STATUSBAR_BACKGROUND_COLOR);
-        mStatusbarBgColor.setOnPreferenceChangeListener(this);
-
-        mStatusbarBgStyle = (ListPreference) findPreference(PREF_STATUSBAR_BACKGROUND_STYLE);
-        mStatusbarBgStyle.setOnPreferenceChangeListener(this);
-
         mLayout = findPreference("toggles");
 
         mFavContact = findPreference(PREF_TOGGLE_FAV_CONTACT);
 
-        updateVisibility();
-    }
-
-    private void updateVisibility() {
-        int visible = Settings.System.getInt(getActivity().getContentResolver(),
-                    Settings.System.STATUSBAR_BACKGROUND_STYLE, 2);
-        if (visible == 2) {
-            mStatusbarBgColor.setEnabled(false);
-        } else {
-            mStatusbarBgColor.setEnabled(true);
-        }
     }
 
     @Override
@@ -104,25 +82,6 @@ public class StatusBarToggles extends AOKPPreferenceFragment implements
             int val = Integer.parseInt((String) newValue);
             Settings.System.putInt(getActivity().getContentResolver(),
                     Settings.System.QUICK_TOGGLES_PER_ROW, val);
-
-        } else if (preference == mStatusbarBgStyle) {
-            int value = Integer.valueOf((String) newValue);
-            int index = mStatusbarBgStyle.findIndexOfValue((String) newValue);
-            Settings.System.putInt(getActivity().getApplicationContext().getContentResolver(),
-                    Settings.System.STATUSBAR_BACKGROUND_STYLE, value);
-            preference.setSummary(mStatusbarBgStyle.getEntries()[index]);
-            updateVisibility();
-            return true;
-
-        } else if (preference == mStatusbarBgColor) {
-            String hex = ColorPickerPreference.convertToARGB(Integer.valueOf(String
-                    .valueOf(newValue)));
-            preference.setSummary(hex);
-
-            int intHex = ColorPickerPreference.convertToColorInt(hex);
-            Settings.System.putInt(getActivity().getContentResolver(),
-                    Settings.System.STATUSBAR_BACKGROUND_COLOR, intHex);
-            Log.e("BAKED", intHex + "");
         }
         return false;
     }

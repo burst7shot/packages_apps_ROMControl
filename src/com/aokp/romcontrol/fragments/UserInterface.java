@@ -100,6 +100,8 @@ public class UserInterface extends AOKPPreferenceFragment implements
     private static final int SELECT_WALLPAPER = 5;
 
     private static final String WALLPAPER_NAME = "notification_wallpaper.jpg";
+    private static final String PREF_STATUSBAR_BACKGROUND_COLOR = "statusbar_background_color";
+    private static final String PREF_STATUSBAR_BACKGROUND_STYLE = "statusbar_background_style";
 
     CheckBoxPreference mAllow180Rotation;
     CheckBoxPreference mDisableBootAnimation;
@@ -107,6 +109,8 @@ public class UserInterface extends AOKPPreferenceFragment implements
 	ListPreference mNotificationBackground;
     Preference mNotificationWallpaper;
     Preference mWallpaperAlpha;
+    ColorPickerPreference mStatusbarBgColor;
+    ListPreference mStatusbarBgStyle;
     Preference mCustomLabel;
     Preference mCustomBootAnimation;
     ImageView view;
@@ -175,6 +179,12 @@ public class UserInterface extends AOKPPreferenceFragment implements
         mShowImeSwitcher.setChecked(Settings.System.getBoolean(mContext.getContentResolver(),
                 Settings.System.SHOW_STATUSBAR_IME_SWITCHER, true));
 
+        mStatusbarBgColor = (ColorPickerPreference) findPreference(PREF_STATUSBAR_BACKGROUND_COLOR);
+        mStatusbarBgColor.setOnPreferenceChangeListener(this);
+
+        mStatusbarBgStyle = (ListPreference) findPreference(PREF_STATUSBAR_BACKGROUND_STYLE);
+        mStatusbarBgStyle.setOnPreferenceChangeListener(this);
+
         mNotificationBackground = (ListPreference) findPreference(PREF_NOTIFICATION_WALLPAPER);
 		mNotificationBackground.setOnPreferenceChangeListener(this);
 
@@ -194,8 +204,18 @@ public class UserInterface extends AOKPPreferenceFragment implements
 
         setHasOptionsMenu(true);
 		updateCustomBackgroundSummary();
+        updateVisibility();
     }
 
+    private void updateVisibility() {
+        int visible = Settings.System.getInt(getActivity().getContentResolver(),
+                    Settings.System.STATUSBAR_BACKGROUND_STYLE, 2);
+        if (visible == 2) {
+            mStatusbarBgColor.setEnabled(false);
+        } else {
+            mStatusbarBgColor.setEnabled(true);
+        }
+    }
 
     private void updateCustomBackgroundSummary() {
         String wallpaperPath = "/data/data/com.baked.romcontrol/files/notification_wallpaper.jpg";
@@ -332,6 +352,11 @@ public class UserInterface extends AOKPPreferenceFragment implements
             .create()
             .show();
             return true;
+		} else if (preference == mShowImeSwitcher) {
+			Settings.System.putBoolean(getActivity().getContentResolver(),
+					Settings.System.SHOW_STATUSBAR_IME_SWITCHER,
+					isCheckBoxPrefernceChecked(preference));
+			return true;
         } else if (preference == mCustomLabel) {
             AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
 
@@ -381,10 +406,29 @@ public class UserInterface extends AOKPPreferenceFragment implements
         return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
 
+    @Override
+    public boolean onPreferenceChange(Preference preference, Object newValue) {
+		if (preference == mStatusbarBgStyle) {
+            int value = Integer.valueOf((String) newValue);
+            int index = mStatusbarBgStyle.findIndexOfValue((String) newValue);
+            Settings.System.putInt(getActivity().getApplicationContext().getContentResolver(),
+                    Settings.System.STATUSBAR_BACKGROUND_STYLE, value);
+            preference.setSummary(mStatusbarBgStyle.getEntries()[index]);
+            updateVisibility();
+            return true;
 
-    public boolean onPreferenceChange(Preference preference, Object objValue) {
-        if (preference == mNotificationBackground) {
-            int indexOf = mNotificationBackground.findIndexOfValue(objValue.toString());
+        } else if (preference == mStatusbarBgColor) {
+            String hex = ColorPickerPreference.convertToARGB(Integer.valueOf(String
+                    .valueOf(newValue)));
+            preference.setSummary(hex);
+
+            int intHex = ColorPickerPreference.convertToColorInt(hex);
+            Settings.System.putInt(getActivity().getContentResolver(),
+                    Settings.System.STATUSBAR_BACKGROUND_COLOR, intHex);
+            Log.e("BAKED", intHex + "");
+
+		} else if (preference == mNotificationBackground) {
+            int indexOf = mNotificationBackground.findIndexOfValue((String) newValue);
             switch (indexOf) {
                 //Displays color dialog when user has chosen color fill
                 case 0:

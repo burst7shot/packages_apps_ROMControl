@@ -2,29 +2,35 @@
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <PreferenceCategory android:title="@string/header_statusbar">
 
-    <PreferenceCategory
-        android:key="bootani"
-        android:title="@string/bootani_cat">
+        <ListPreference
+            android:key="statusbar_background_style"
+            android:layout="?android:attr/preferenceLayoutChild"
+            android:persistent="true"
+            android:entries="@array/navbar_background_entries"
+            android:entryValues="@array/navbar_background_values"
+            android:title="@string/statusbar_background_style" />
 
-        <Preference
-            android:key="custom_bootanimation"
-            android:title="@string/custom_bootanimation_title"
-            android:summary="@string/custom_bootanimation_summary" />
+        <net.margaritov.preference.colorpicker.ColorPickerPreference
+            android:key="statusbar_background_color"
+            android:layout="?android:attr/preferenceLayoutChild"
+            android:persistent="true"
+            android:title="@string/statusbar_background_color"
+            android:defaultValue="#000000"
+            alphaSlider="true" />
 
-         <CheckBoxPreference
-            android:key="disable_bootanimation"
-            android:title="@string/disable_bootanimation_title" />
+        <CheckBoxPreference
+            android:key="status_bar_notif_count"
+            android:title="@string/status_bar_notif_count_title"
+            android:summary="@string/status_bar_notif_count_summary"
+            android:defaultValue="false" />
 
     </PreferenceCategory>
 
     <PreferenceCategory
         android:key="notification"
         android:title="@string/notification_cat">
-
-        <Preference
-            android:key="custom_carrier_label"
-            android:title="@string/custom_carrier_label_title" />
 
         <ListPreference
 	        android:key="notification_wallpaper"
@@ -38,23 +44,14 @@
             android:key="notification_wallpaper_alpha"
             android:title="@string/notif_wallpaper_alpha_title" />
 
-        <CheckBoxPreference
-            android:key="status_bar_notif_count"
-            android:title="@string/status_bar_notif_count_title"
-            android:summary="@string/status_bar_notif_count_summary"
-            android:defaultValue="false" />
+        <Preference
+            android:key="custom_carrier_label"
+            android:title="@string/custom_carrier_label_title" />
 
         <CheckBoxPreference
             android:key="vibrate_notif_expand"
             android:title="@string/vibrate_notif_expand_title"
             android:summary="@string/vibrate_notif_expand_summary" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:key="navbar"
-        android:title="@string/navbar_cat">
-
 
         <CheckBoxPreference
             android:key="recent_kill_all"
@@ -66,16 +63,16 @@
             android:title="@string/ram_bar"
             android:summary="@string/ram_bar_summary" />
 
-        <CheckBoxPreference
-            android:key="kill_app_longpress_back"
-            android:title="@string/kill_app_longpress_back"
-            android:summary="@string/kill_app_longpress_back_summary" />
-
     </PreferenceCategory>
 
      <PreferenceCategory
             android:key="misc"
             android:title="@string/misc_short">
+
+        <CheckBoxPreference
+            android:key="kill_app_longpress_back"
+            android:title="@string/kill_app_longpress_back"
+            android:summary="@string/kill_app_longpress_back_summary" />
 
          <CheckBoxPreference
             android:key="rotate_180"
@@ -87,6 +84,21 @@
             android:title="@string/ime_switcher_title"
             android:summary="@string/ime_switcher_summary"
             android:defaultValue="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="bootani"
+        android:title="@string/bootani_cat">
+
+        <Preference
+            android:key="custom_bootanimation"
+            android:title="@string/custom_bootanimation_title"
+            android:summary="@string/custom_bootanimation_summary" />
+
+         <CheckBoxPreference
+            android:key="disable_bootanimation"
+            android:title="@string/disable_bootanimation_title" />
 
     </PreferenceCategory>
 
